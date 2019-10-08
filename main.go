@@ -30,11 +30,12 @@ func main() {
 	}
 
 	dep := GetRecursiveDependencies(path)
-	fmt.Println(dep)
 	dep = RemoveMissingImport(dep)
 	result := PrintForDAG(dep)
-
-	fmt.Println(result)
+	result = strings.Replace(result, "github.com", "g", -1)
+	result = strings.Replace(result, "tokopedia", "t", -1)
+	result = strings.Replace(result, "digital", "d", -1)
+	ShowInDagBrowser(result)
 }
 
 func RemoveMissingImport(dependencies map[string][]string) map[string][]string {

@@ -56,9 +56,25 @@
 <div id="container">
 
 </div>
-<textarea id="input-settings"></textarea>
+<textarea id="input-settings">
+	{
+  "container": {
+    "id": "#container",
+    "width": 900,
+    "height": 600
+  },
+  "rect": {
+    "width": 240,
+    "height": 60
+  },
+  "font": {
+    "family": "Ubuntu",
+    "size": 14
+  }
+}
+</textarea>
 <textarea id="input-content">
-	{{content}}
+{{.DAG}}
 </textarea>
 <textarea id="input-md"></textarea>
 
@@ -102,6 +118,7 @@ inputSettings.onchange = function(e) {
 }
 
 graphInit()
+graphDraw(inputContent.value)
 
 
 </script>
