@@ -12,6 +12,8 @@ import (
 )
 
 func main() {
+	IgnoreInit()
+	ShortenInit()
 
 	flag.Parse()
 
@@ -32,9 +34,7 @@ func main() {
 	dep := GetRecursiveDependencies(path)
 	dep = RemoveMissingImport(dep)
 	result := PrintForDAG(dep)
-	result = strings.Replace(result, "github.com", "g", -1)
-	result = strings.Replace(result, "tokopedia", "t", -1)
-	result = strings.Replace(result, "digital", "d", -1)
+	result = Shorten(result)
 	ShowInDagBrowser(result)
 }
 
@@ -77,6 +77,10 @@ func GetRecursiveDependencies(rootPath string) map[string][]string {
 		}
 
 		if !info.IsDir() {
+			return nil
+		}
+
+		if IsIgnored(path) {
 			return nil
 		}
 

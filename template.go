@@ -8,8 +8,12 @@ import (
 	"os"
 )
 
-func ShowInDagBrowser(dag string) {
-	t, _ := template.ParseFiles("dag.html")
+func ShowInDagBrowser(input string) {
+	t := template.New("dag.html")
+	t, err := t.Parse(dagTemplate)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	f, err := ioutil.TempFile(os.TempDir(), "dep_drawer_*.html")
 	if err != nil {
@@ -17,7 +21,7 @@ func ShowInDagBrowser(dag string) {
 	}
 	defer f.Close()
 
-	err = t.Execute(f, struct{ DAG string }{dag})
+	err = t.Execute(f, struct{ DAG string }{input})
 	if err != nil {
 		log.Fatal(err)
 	}
