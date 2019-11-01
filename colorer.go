@@ -2,7 +2,6 @@ package main
 
 import (
 	"flag"
-	"log"
 )
 
 type pkgToBeColored []string
@@ -34,7 +33,6 @@ func AddColor(allValues map[string][]string) map[string][]string {
 	if len(pkgToBeColoredVar) != len(pkgColorListVar) {
 		panic("Need same size of pkg color and the color? need -cp and -cn")
 	}
-	log.Println(allValues)
 
 	result := allValues
 
@@ -42,11 +40,14 @@ func AddColor(allValues map[string][]string) map[string][]string {
 		p := pkgToBeColoredVar[i]
 		c := pkgColorListVar[i]
 
-		result[p] = append(result[p], "| "+c)
+		deps, ok := result[p]
+		if !ok {
+			panic("Cannot find package " + p)
+		}
+
+		result[p] = append(deps, "| "+c)
 	}
 
-	log.Println("result")
-	log.Println(result)
 	return result
 }
 

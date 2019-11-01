@@ -25,3 +25,25 @@ func TestAddColor(t *testing.T) {
 	}
 
 }
+
+func TestAddColor_ShouldPanicIfPackageNotExists(t *testing.T) {
+
+	defer func() {
+		r := recover()
+		if r == nil {
+			t.Error("Should be panic")
+		}
+	}()
+
+	pkgToBeColoredVar = []string{"g/e/D"}
+	pkgColorListVar = []string{"red"}
+
+	input := map[string][]string{
+		"g/e/B": []string{},
+		"g/e/C": []string{},
+		"g/e/A": []string{"g/e/B", "g/e/C"},
+	}
+
+	_ = AddColor(input)
+
+}
