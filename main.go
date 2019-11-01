@@ -14,6 +14,7 @@ import (
 func main() {
 	IgnoreInit()
 	ShortenInit()
+	ColorerInit()
 
 	flag.Parse()
 
@@ -33,6 +34,7 @@ func main() {
 
 	dep := GetRecursiveDependencies(path)
 	dep = RemoveMissingImport(dep)
+	dep = AddColor(dep)
 	result := PrintForDAG(dep)
 	result = Shorten(result)
 	ShowInDagBrowser(result)
