@@ -151,6 +151,6 @@ func MapKeyIntoSlice(theMap map[string]bool) []string {
 
 func RemoveGoDir(path string) string {
 	p, _ := filepath.Abs(path)
-	p = strings.Replace(p, "/home/nakama/go/src/", "", 1)
+	p = strings.Replace(p, os.Getenv("GOPATH")+"/src/", "", 1)
 	return p
 }
