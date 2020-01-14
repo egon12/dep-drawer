@@ -36,10 +36,10 @@ func main() {
 	//dep = RemoveMissingImport(dep)
 	dep = OuterPackageGrouper(dep, RemoveGoDir(path))
 	dep = GroupStdlibDependency(dep)
+	//dep = OuterPackageAdder(dep, RemoveGoDir(path))
 	dep = AddColor(dep)
 	result := PrintForDAG(dep)
 	result = Shorten(result)
-	println(result)
 	ShowInDagBrowser(result)
 }
 
@@ -98,10 +98,14 @@ func GetRecursiveDependencies(rootPath string) map[string][]string {
 	return result
 }
 
+func filterTest(f os.FileInfo) bool {
+	return !strings.HasSuffix(f.Name(), "_test.go")
+}
+
 func GetDependencies(dirName string) map[string][]string {
 
 	fs := token.NewFileSet()
-	f, err := parser.ParseDir(fs, dirName, nil, parser.ImportsOnly)
+	f, err := parser.ParseDir(fs, dirName, filterTest, parser.ImportsOnly)
 	if err != nil {
 		panic(err)
 	}
