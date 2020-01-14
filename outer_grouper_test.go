@@ -19,7 +19,7 @@ func TestOuterGrouper(t *testing.T) {
 	want := map[string][]string{
 		"github.com/egon12/dep-drawer":         []string{"github.com/egon12/dep-drawer/browers"},
 		"github.com/egon12/dep-drawer/browser": []string{"vendor"},
-		"vendor": []string{},
+		"vendor":                               []string{},
 	}
 
 	if !reflect.DeepEqual(got, want) {

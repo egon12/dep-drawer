@@ -33,10 +33,13 @@ func main() {
 	}
 
 	dep := GetRecursiveDependencies(path)
-	dep = RemoveMissingImport(dep)
+	//dep = RemoveMissingImport(dep)
+	dep = OuterPackageGrouper(dep, RemoveGoDir(path))
+	dep = GroupStdlibDependency(dep)
 	dep = AddColor(dep)
 	result := PrintForDAG(dep)
 	result = Shorten(result)
+	println(result)
 	ShowInDagBrowser(result)
 }
 

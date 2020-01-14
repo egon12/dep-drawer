@@ -13,7 +13,7 @@ func GroupStdlibDependency(d map[string][]string) map[string][]string {
 
 		newNode := Node{Name: node.Name}
 		for _, d := range node.Dependencies {
-			if strings.Contains(d, ".") {
+			if strings.Contains(d, ".") || d == "vendor" {
 				newNode = newNode.AddDependency(d)
 			} else {
 				useStdlib = true
