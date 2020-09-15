@@ -18,25 +18,11 @@ func main() {
 
 	flag.Parse()
 
-	args := flag.Args()
-
-	path := "."
-
-	if len(args) > 0 {
-		path = args[0]
-	}
-
-	path, err := filepath.Abs(path)
-	if err != nil {
-		fmt.Errorf("Cannot get absolute path from %s", path)
-		return
-	}
-
-	dep := GetRecursiveDependencies(path)
+	dep := GetRecursiveDependencies(GetPath())
 	//dep = RemoveMissingImport(dep)
-	dep = OuterPackageGrouper(dep, RemoveGoDir(path))
+	//dep = OuterPackageGrouper(dep, GetPkg())
 	dep = GroupStdlibDependency(dep)
-	//dep = OuterPackageAdder(dep, RemoveGoDir(path))
+	dep = OuterPackageAdder(dep, GetPkg())
 	dep = AddColor(dep)
 	result := PrintForDAG(dep)
 	result = Shorten(result)
@@ -111,10 +97,10 @@ func GetDependencies(dirName string) map[string][]string {
 	}
 
 	packagesImportSet := map[string]map[string]bool{}
-	packageName := ""
+	packageName := filepath.Base(dirName)
 
 	for _, i := range f {
-		packageName = i.Name
+		//packageName = i.Name
 
 		importSet, ok := packagesImportSet[packageName]
 		if !ok {
@@ -154,10 +140,4 @@ func MapKeyIntoSlice(theMap map[string]bool) []string {
 		index += 1
 	}
 	return slice
-}
-
-func RemoveGoDir(path string) string {
-	p, _ := filepath.Abs(path)
-	p = strings.Replace(p, os.Getenv("GOPATH")+"/src/", "", 1)
-	return p
 }

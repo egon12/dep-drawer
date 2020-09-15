@@ -21,6 +21,11 @@ var namesToBeShortenVar namesToBeShorten
 func Shorten(allValues string) string {
 	result := allValues
 
+	// replace default path first
+	pkgName := GetPkg()
+	result = strings.Replace(result, pkgName, ".", -1)
+
+	// replace all others
 	for _, s := range namesToBeShortenVar {
 		firstLetter := string(s[0])
 		result = strings.Replace(result, s, firstLetter, -1)
