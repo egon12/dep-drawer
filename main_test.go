@@ -43,10 +43,3 @@ func TestAst(t *testing.T) {
 	t.Errorf("%T\n %+v", f, f)
 
 }
-
-func TestGetDependencies(t *testing.T) {
-	a := GetRecursiveDependencies("diffpackage")
-	for k, v := range a {
-		t.Errorf("%v: %v", k, v)
-	}
-}
