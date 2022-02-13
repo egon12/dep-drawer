@@ -9,59 +9,68 @@ import (
 	"strings"
 )
 
-func filterTest(f os.FileInfo) bool {
-	return !strings.HasSuffix(f.Name(), "_test.go")
+func GetRecursiveDependencies(rootPath string) map[string][]string {
+	result := map[string][]string{}
+
+	filepath.Walk(rootPath, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+
+		if !info.IsDir() {
+			return nil
+		}
+
+		if IsIgnored(path) {
+			return nil
+		}
+
+		if !IsPkg(path) {
+			return nil
+		}
+
+		k := GetModPkg(path)
+		v := GetImports(path)
+		result[k] = v
+		return nil
+	})
+
+	return result
 }
 
-func GetDependencies(dirName string) map[string][]string {
+func GetImports(path string) []string {
 	fs := token.NewFileSet()
-	f, err := parser.ParseDir(fs, dirName, filterTest, parser.ImportsOnly)
+	f, err := parser.ParseDir(fs, path, filterTest, parser.ImportsOnly)
 	if err != nil {
 		panic(err)
 	}
 
-	packagesImportSet := map[string]map[string]bool{}
-	packageName := filepath.Base(dirName)
+	result := make(map[string]struct{})
 
 	for _, i := range f {
-		//packageName = i.Name
-
-		importSet, ok := packagesImportSet[packageName]
-		if !ok {
-			importSet = map[string]bool{}
-		}
-
 		ast.Inspect(i, func(n ast.Node) bool {
-			switch x := n.(type) {
-			case *ast.ImportSpec:
+			x, ok := n.(*ast.ImportSpec)
+			if ok {
 				importName := strings.Replace(x.Path.Value, "\"", "", -1)
-				importSet[importName] = true
+				result[importName] = struct{}{}
 			}
 			return true
 		})
-
-		packagesImportSet[packageName] = importSet
 	}
 
-	packagesImportList := map[string][]string{}
-
-	for k, v := range packagesImportSet {
-		fullPacakgeName := RemoveGoDir(filepath.Dir(dirName)) + "/" + k
-		importList := MapKeyIntoSlice(v)
-		packagesImportList[fullPacakgeName] = importList
-	}
-
-	return packagesImportList
-
+	return mapKeyToSlice(result)
 }
 
-func MapKeyIntoSlice(theMap map[string]bool) []string {
-	theMapLen := len(theMap)
-	slice := make([]string, theMapLen, theMapLen)
+func mapKeyToSlice(input map[string]struct{}) []string {
+	result := make([]string, len(input))
 	index := 0
-	for k, _ := range theMap {
-		slice[index] = k
+	for val, _ := range input {
+		result[index] = val
 		index += 1
 	}
-	return slice
+	return result
+}
+
+func filterTest(f os.FileInfo) bool {
+	return !strings.HasSuffix(f.Name(), "_test.go")
 }

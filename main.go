@@ -3,8 +3,6 @@ package main
 import (
 	"flag"
 	"fmt"
-	"os"
-	"path/filepath"
 	"strings"
 )
 
@@ -16,8 +14,8 @@ func main() {
 	flag.Parse()
 
 	dep := GetRecursiveDependencies(GetPath())
-	//dep = RemoveMissingImport(dep)
-	//dep = OuterPackageGrouper(dep, GetPkg())
+	// dep = RemoveMissingImport(dep)
+	dep = OuterPackageGrouper(dep, GetPkg())
 	dep = GroupStdlibDependency(dep)
 	dep = OuterPackageAdder(dep, GetPkg())
 	dep = AddColor(dep)
@@ -52,31 +50,5 @@ func PrintForDAG(dependencies map[string][]string) string {
 		importList = strings.Replace(importList, "\"", "", -1)
 		result = result + fmt.Sprintf("%s %s\n", k, importList)
 	}
-	return result
-}
-
-func GetRecursiveDependencies(rootPath string) map[string][]string {
-
-	result := map[string][]string{}
-
-	filepath.Walk(rootPath, func(path string, info os.FileInfo, err error) error {
-		if err != nil {
-			return err
-		}
-
-		if !info.IsDir() {
-			return nil
-		}
-
-		if IsIgnored(path) {
-			return nil
-		}
-
-		for k, v := range GetDependencies(path) {
-			result[k] = v
-		}
-		return nil
-	})
-
 	return result
 }

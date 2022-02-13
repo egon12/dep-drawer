@@ -5,10 +5,16 @@ import (
 	"testing"
 )
 
-func TestGetDependencies(t *testing.T) {
-	result := GetDependencies(".")
+func TestGetRecursiveDependencies(t *testing.T) {
+	a := GetRecursiveDependencies("diffpackage")
+	for k, v := range a {
+		t.Errorf("%v: %v", k, v)
+	}
+}
 
-	got := result["github.com/egon12/dep-drawer/."]
+func TestGetImports(t *testing.T) {
+	got := GetImports(".")
+
 	want := []string{
 		"flag",
 		"bytes",
@@ -40,9 +46,19 @@ func TestGetDependencies(t *testing.T) {
 	}
 }
 
-func TestGetRecursiveDependencies(t *testing.T) {
-	a := GetRecursiveDependencies("diffpackage")
-	for k, v := range a {
-		t.Errorf("%v: %v", k, v)
+func TestGetImports_diffpackage(t *testing.T) {
+	got := GetImports("./diffpackage")
+
+	want := []string{
+		"github.com/egon12/dep-drawer/diffpackage/diffpackage2",
+		"github.com/egon12/dep-drawer/diffpackage/diffpackage3",
+	}
+
+	sort.Strings(got)
+
+	for i := range got {
+		if got[i] != want[i] {
+			t.Errorf("want: %v\n got: %v\n", want[i], got[i])
+		}
 	}
 }
